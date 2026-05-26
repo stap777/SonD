@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sond
 
-## Getting Started
+Sond is a production intelligence system that helps developers investigate production failures by correlating repository activity, operational logs and team discussions into a single workflow using Coral as the retrieval layer.
 
-First, run the development server:
+Instead of manually jumping between commits, logs and chats while debugging deployments, Sond tries to surface the most relevant operational evidence and identify possible root causes faster.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## What Sond Does
+
+A developer can ask something like:
+
+> "why did auth fail after latest deploy"
+
+Sond will:
+- inspect recent commits and PR activity
+- correlate deployment timestamps
+- analyse uploaded logs and incidents
+- retrieve operational evidence using Coral
+- generate investigation summaries and recommendations
+
+The project focuses on:
+- clean investigation workflows
+- meaningful Coral integration
+- modular architecture
+- operational usefulness
+- stable and readable implementation
+
+---
+
+## How It Works
+
+```text
+User Investigation Query
+            ↓
+       Coral Retrieval
+            ↓
+   Structured Operational Data
+            ↓
+    Correlation + Analysis
+            ↓
+ Investigation Report Output
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Coral acts as the unified retrieval and orchestration layer for operational sources.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The AI layer is responsible only for:
+- analysis
+- summarization
+- recommendations
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Current Sources
 
-To learn more about Next.js, take a look at the following resources:
+Planned supported sources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- GitHub repository activity
+- uploaded deployment logs
+- uploaded incident files
+- operational documentation
+- Slack discussions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Next.js
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Coral
+- GitHub API
+- Gemini / Ollama
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+# Project Structure
+
+```text
+src/
+│
+├── app/                  # Next.js app router
+│
+├── components/           # Reusable UI components
+│   ├── dashboard/
+│   ├── investigation/
+│   ├── layout/
+│   ├── timeline/
+│   └── ui/
+│
+├── lib/
+│   ├── ai/               # AI integration logic
+│   ├── coral/            # Coral retrieval layer
+│   ├── github/           # GitHub integration
+│   ├── parsers/          # File/log parsers
+│   └── utils/
+│
+├── services/             # Investigation workflows
+│
+├── prompts/              # AI prompts
+│
+├── types/                # Shared TypeScript types
+│
+├── constants/
+│
+└── data/                 # Local structured datasets
+    ├── docs/
+    ├── logs/
+    └── slack/
+```
+
+---
+
+# Documentation
+
+Additional project documentation is available inside:
+
+```text
+docs/
+```
+
+Important files:
+
+- `architecture.md`
+- `workflow.md`
+- `development-rules.md`
+
+Please read the docs before making major architectural or workflow changes.
+
+---
+
+
+
+# Vision
+
+Sond is not intended to be a generic AI chatbot.
+
+The goal is to build a focused operational investigation system that helps developers understand production failures faster using structured retrieval and correlation workflows powered by Coral.
