@@ -1,0 +1,8 @@
+[
+  {
+    "commit": "fix-auth-timeout",
+    "service": "auth-service",
+    "status": "failed",
+    "timestamp": "2026-05-26T10:15:00Z"
+  }
+]
