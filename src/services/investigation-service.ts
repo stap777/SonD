@@ -1,35 +1,39 @@
-import incidentData from "@/data/logs/incident.json";
+import { CoralIncidentRetrieval } from "@/lib/coral/incident-retrieval";
 import { GitHubService } from "@/lib/github/github-service";
 import type { GitHubCommit } from "@/lib/github/github-types";
 import type {
   CreateInvestigationContextOptions,
   IncidentCommitCorrelation,
-  IncidentFilter,
   InvestigationContext,
   LocalIncident,
 } from "@/types/investigation";
 
+export { filterIncidents } from "@/lib/coral/incident-retrieval";
+
 const DEFAULT_COMMIT_LIMIT = 20;
-const INCIDENT_SOURCE_PATH = "src/data/logs/incident.json";
 
 type CommitRetriever = Pick<GitHubService, "getRecentCommits">;
-
-const localIncidents: LocalIncident[] = incidentData;
+type IncidentRetriever = Pick<CoralIncidentRetrieval, "getLocalIncidents">;
 
 export class InvestigationService {
-  constructor(private readonly githubService: CommitRetriever = new GitHubService()) {}
+  constructor(
+    private readonly githubService: CommitRetriever = new GitHubService(),
+    private readonly coralRetrieval: IncidentRetriever = new CoralIncidentRetrieval(),
+  ) {}
 
   async createInvestigationContext(
     options: CreateInvestigationContextOptions,
   ): Promise<InvestigationContext> {
     const perPage = options.perPage ?? DEFAULT_COMMIT_LIMIT;
-    const incidents = filterIncidents(localIncidents, options.incidentFilter);
-    const commits = await this.githubService.getRecentCommits({
-      owner: options.owner,
-      repo: options.repo,
-      branch: options.branch,
-      perPage,
-    });
+    const [incidentRetrieval, commits] = await Promise.all([
+      this.coralRetrieval.getLocalIncidents(options.incidentFilter),
+      this.githubService.getRecentCommits({
+        owner: options.owner,
+        repo: options.repo,
+        branch: options.branch,
+        perPage,
+      }),
+    ]);
 
     return {
       generatedAt: new Date().toISOString(),
@@ -42,8 +46,8 @@ export class InvestigationService {
       sources: {
         incidents: {
           type: "local-json",
-          path: INCIDENT_SOURCE_PATH,
-          total: incidents.length,
+          path: incidentRetrieval.sourcePath,
+          total: incidentRetrieval.incidents.length,
           filters: options.incidentFilter ?? null,
         },
         commits: {
@@ -52,28 +56,12 @@ export class InvestigationService {
           perPage,
         },
       },
-      incidents,
+      incidents: incidentRetrieval.incidents,
       commits,
-      correlations: correlateIncidentsWithCommits(incidents, commits),
+      correlations: correlateIncidentsWithCommits(incidentRetrieval.incidents, commits),
       aiAnalysis: null,
     };
   }
-}
-
-export function filterIncidents(
-  incidents: LocalIncident[],
-  filter?: IncidentFilter,
-): LocalIncident[] {
-  if (!filter) {
-    return incidents;
-  }
-
-  return incidents.filter((incident) => {
-    const serviceMatches = filter.service === undefined || incident.service === filter.service;
-    const statusMatches = filter.status === undefined || incident.status === filter.status;
-
-    return serviceMatches && statusMatches;
-  });
 }
 
 export function correlateIncidentsWithCommits(
