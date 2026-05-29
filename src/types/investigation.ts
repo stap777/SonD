@@ -1,4 +1,9 @@
-import type { GitHubCommit, GitHubRepository } from "@/lib/github/github-types";
+import type { CoralCheckSuite, CoralCommitStatus } from "@/lib/coral/coral-types";
+import type {
+  GitHubCommit,
+  GitHubPullRequest,
+  GitHubRepository,
+} from "@/lib/github/github-types";
 
 export type LocalIncident = {
   commit: string;
@@ -41,13 +46,28 @@ export type InvestigationContext = {
       filters: IncidentFilter | null;
     };
     commits: {
-      type: "github";
+      type: "coral-github";
       total: number;
       perPage: number;
+    };
+    pullRequests: {
+      type: "coral-github";
+      total: number;
+    };
+    commitStatuses: {
+      type: "coral-github";
+      total: number;
+    };
+    checkSuites: {
+      type: "coral-github";
+      total: number;
     };
   };
   incidents: LocalIncident[];
   commits: GitHubCommit[];
+  pullRequests: GitHubPullRequest[];
+  commitStatuses: CoralCommitStatus[];
+  checkSuites: CoralCheckSuite[];
   correlations: IncidentCommitCorrelation[];
   aiAnalysis: null;
 };

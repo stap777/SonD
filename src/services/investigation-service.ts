@@ -1,5 +1,5 @@
 import { CoralIncidentRetrieval } from "@/lib/coral/incident-retrieval";
-import { GitHubService } from "@/lib/github/github-service";
+import { CoralGitHubRetrieval } from "@/lib/coral/coral-github";
 import type { GitHubCommit } from "@/lib/github/github-types";
 import type {
   CreateInvestigationContextOptions,
@@ -12,12 +12,12 @@ export { filterIncidents } from "@/lib/coral/incident-retrieval";
 
 const DEFAULT_COMMIT_LIMIT = 20;
 
-type CommitRetriever = Pick<GitHubService, "getRecentCommits">;
+type GitHubEvidenceRetriever = Pick<CoralGitHubRetrieval, "getRepositoryEvidence">;
 type IncidentRetriever = Pick<CoralIncidentRetrieval, "getLocalIncidents">;
 
 export class InvestigationService {
   constructor(
-    private readonly githubService: CommitRetriever = new GitHubService(),
+    private readonly githubRetrieval: GitHubEvidenceRetriever = new CoralGitHubRetrieval(),
     private readonly coralRetrieval: IncidentRetriever = new CoralIncidentRetrieval(),
   ) {}
 
@@ -25,9 +25,9 @@ export class InvestigationService {
     options: CreateInvestigationContextOptions,
   ): Promise<InvestigationContext> {
     const perPage = options.perPage ?? DEFAULT_COMMIT_LIMIT;
-    const [incidentRetrieval, commits] = await Promise.all([
+    const [incidentRetrieval, githubEvidence] = await Promise.all([
       this.coralRetrieval.getLocalIncidents(options.incidentFilter),
-      this.githubService.getRecentCommits({
+      this.githubRetrieval.getRepositoryEvidence({
         owner: options.owner,
         repo: options.repo,
         branch: options.branch,
@@ -51,14 +51,29 @@ export class InvestigationService {
           filters: options.incidentFilter ?? null,
         },
         commits: {
-          type: "github",
-          total: commits.length,
+          type: "coral-github",
+          total: githubEvidence.commits.length,
           perPage,
+        },
+        pullRequests: {
+          type: "coral-github",
+          total: githubEvidence.pullRequests.length,
+        },
+        commitStatuses: {
+          type: "coral-github",
+          total: githubEvidence.commitStatuses.length,
+        },
+        checkSuites: {
+          type: "coral-github",
+          total: githubEvidence.checkSuites.length,
         },
       },
       incidents: incidentRetrieval.incidents,
-      commits,
-      correlations: correlateIncidentsWithCommits(incidentRetrieval.incidents, commits),
+      commits: githubEvidence.commits,
+      pullRequests: githubEvidence.pullRequests,
+      commitStatuses: githubEvidence.commitStatuses,
+      checkSuites: githubEvidence.checkSuites,
+      correlations: correlateIncidentsWithCommits(incidentRetrieval.incidents, githubEvidence.commits),
       aiAnalysis: null,
     };
   }
