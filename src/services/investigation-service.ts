@@ -7,6 +7,8 @@ import type {
   InvestigationContext,
   LocalIncident,
 } from "@/types/investigation";
+import { AnalysisService } from "@/lib/ai/analysis-service";
+import type { AIAnalysis } from "@/lib/ai/ai-types";
 
 export { filterIncidents } from "@/lib/coral/incident-retrieval";
 
@@ -19,6 +21,7 @@ export class InvestigationService {
   constructor(
     private readonly githubRetrieval: GitHubEvidenceRetriever = new CoralGitHubRetrieval(),
     private readonly coralRetrieval: IncidentRetriever = new CoralIncidentRetrieval(),
+    private readonly analysisService: AnalysisService = new AnalysisService(),
   ) {}
 
   async createInvestigationContext(
@@ -35,7 +38,7 @@ export class InvestigationService {
       }),
     ]);
 
-    return {
+    const contextWithoutAnalysis: Omit<InvestigationContext, "aiAnalysis"> = {
       generatedAt: new Date().toISOString(),
       query: options.query ?? null,
       repository: {
@@ -74,7 +77,18 @@ export class InvestigationService {
       commitStatuses: githubEvidence.commitStatuses,
       checkSuites: githubEvidence.checkSuites,
       correlations: correlateIncidentsWithCommits(incidentRetrieval.incidents, githubEvidence.commits),
-      aiAnalysis: null,
+    };
+
+    let aiAnalysis: AIAnalysis | null = null;
+    try {
+      aiAnalysis = await this.analysisService.analyze(contextWithoutAnalysis);
+    } catch (error) {
+      console.warn("AI Analysis failed gracefully:", error instanceof Error ? error.message : String(error));
+    }
+
+    return {
+      ...contextWithoutAnalysis,
+      aiAnalysis,
     };
   }
 }

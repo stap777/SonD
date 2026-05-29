@@ -1,4 +1,5 @@
 import type { CoralCheckSuite, CoralCommitStatus } from "@/lib/coral/coral-types";
+import type { AIAnalysis } from "@/lib/ai/ai-types";
 import type {
   GitHubCommit,
   GitHubPullRequest,
@@ -69,5 +70,5 @@ export type InvestigationContext = {
   commitStatuses: CoralCommitStatus[];
   checkSuites: CoralCheckSuite[];
   correlations: IncidentCommitCorrelation[];
-  aiAnalysis: null;
+  aiAnalysis: AIAnalysis | null;
 };

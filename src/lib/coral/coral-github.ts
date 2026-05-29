@@ -54,15 +54,70 @@ export class CoralGitHubRetrieval {
   async getRepositoryEvidence(
     options: CoralGitHubRetrievalOptions,
   ): Promise<CoralGitHubEvidence> {
+    const t0 = performance.now();
+
+    let tCommitsStart = 0;
+    let tCommitsEnd = 0;
+    let tPRsStart = 0;
+    let tPRsEnd = 0;
+
     const [commits, pullRequests] = await Promise.all([
-      this.getRecentCommits(options),
-      this.getPullRequests(options),
+      (async () => {
+        tCommitsStart = performance.now();
+        const res = await this.getRecentCommits(options);
+        tCommitsEnd = performance.now();
+        return res;
+      })(),
+      (async () => {
+        tPRsStart = performance.now();
+        const res = await this.getPullRequests(options);
+        tPRsEnd = performance.now();
+        return res;
+      })(),
     ]);
+
+    console.log(`[DIAGNOSTIC] Commits retrieval: ${(tCommitsEnd - tCommitsStart).toFixed(2)}ms`);
+    console.log(`[DIAGNOSTIC] Pull Requests retrieval: ${(tPRsEnd - tPRsStart).toFixed(2)}ms`);
+
     const refs = commits.map((commit) => commit.sha);
+
+    let tStatusesStart = 0;
+    let tStatusesEnd = 0;
+    let tChecksStart = 0;
+    let tChecksEnd = 0;
+
     const [commitStatuses, checkSuites] = await Promise.all([
-      this.getCommitStatuses({ ...options, refs }),
-      this.getCommitCheckSuites({ ...options, refs }),
+      (async () => {
+        try {
+          tStatusesStart = performance.now();
+          const res = await this.getCommitStatuses({ ...options, refs });
+          tStatusesEnd = performance.now();
+          return res;
+        } catch (error) {
+          console.warn("[WARNING] Commit statuses retrieval failed. Continuing without statuses:", error instanceof Error ? error.message : String(error));
+          tStatusesEnd = performance.now();
+          return [];
+        }
+      })(),
+      (async () => {
+        try {
+          tChecksStart = performance.now();
+          const res = await this.getCommitCheckSuites({ ...options, refs });
+          tChecksEnd = performance.now();
+          return res;
+        } catch (error) {
+          console.warn("[WARNING] Check suites retrieval failed. Continuing without check suites:", error instanceof Error ? error.message : String(error));
+          tChecksEnd = performance.now();
+          return [];
+        }
+      })(),
     ]);
+
+    console.log(`[DIAGNOSTIC] Statuses retrieval: ${(tStatusesEnd - tStatusesStart).toFixed(2)}ms`);
+    console.log(`[DIAGNOSTIC] Check Suites retrieval: ${(tChecksEnd - tChecksStart).toFixed(2)}ms`);
+
+    const totalTime = performance.now() - t0;
+    console.log(`[DIAGNOSTIC] Total Coral evidence retrieval: ${totalTime.toFixed(2)}ms`);
 
     return {
       commits,
@@ -85,7 +140,6 @@ export class CoralGitHubRetrieval {
       WHERE owner = ${sqlString(options.owner)}
         AND repo = ${sqlString(options.repo)}
         ${options.branch ? `AND ref = ${sqlString(options.branch)}` : ""}
-      ORDER BY commit__author__date DESC
       LIMIT ${sqlLimit(options.perPage)}
     `);
 
@@ -112,7 +166,6 @@ export class CoralGitHubRetrieval {
       FROM github.pulls
       WHERE owner = ${sqlString(options.owner)}
         AND repo = ${sqlString(options.repo)}
-      ORDER BY updated_at DESC
       LIMIT ${sqlLimit(options.perPage)}
     `);
 
@@ -146,7 +199,6 @@ export class CoralGitHubRetrieval {
         WHERE owner = ${sqlString(options.owner)}
           AND repo = ${sqlString(options.repo)}
           AND ref = ${sqlString(ref)}
-        ORDER BY updated_at DESC
         LIMIT 20
       `,
     );
@@ -180,7 +232,6 @@ export class CoralGitHubRetrieval {
         WHERE owner = ${sqlString(options.owner)}
           AND repo = ${sqlString(options.repo)}
           AND ref = ${sqlString(ref)}
-        ORDER BY updated_at DESC
         LIMIT 20
       `,
     );
