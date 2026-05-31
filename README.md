@@ -1,3 +1,4 @@
+<img width="1983" height="793" alt="ChatGPT Image May 31, 2026, 09_38_21 PM" src="https://github.com/user-attachments/assets/a8bc16e0-9974-4d60-989b-90000bfeed30" />
 # Sond: Production Intelligence System
 
 Sond is an AI-powered production intelligence system designed to help developers investigate production failures by correlating repository activity, operational logs, and status checks into a single cohesive workflow using Coral as the structured retrieval layer.
