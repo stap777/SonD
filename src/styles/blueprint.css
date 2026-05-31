@@ -1,0 +1,21 @@
+/* Sond Technical Paper Grid System */
+
+/* Ultra-subtle engineering paper grid (felt, not noticed) */
+.blueprint-grid {
+  background-color: #E5E3DB;
+  background-image: 
+    linear-gradient(to right, rgba(17, 17, 17, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17, 17, 17, 0.015) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center center;
+}
+
+/* Dark mode subtle grid */
+.dark .blueprint-grid {
+  background-color: #0A0B0D;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center center;
+}

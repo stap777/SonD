@@ -1,0 +1,202 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "./blueprint.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Font bindings */
+  --font-sans: var(--font-inter), sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), monospace;
+  --font-display: var(--font-space-grotesk), sans-serif;
+
+  /* Custom Neo-Brutalist borders and sharp hard shadows */
+  --border-width-heavy: 2px;
+  --border-width-mega: 3px;
+  
+  --shadow-neo-sm: 2px 2px 0px 0px #111111;
+  --shadow-neo: 4px 4px 0px 0px #111111;
+  --shadow-neo-lg: 6px 6px 0px 0px #111111;
+  --shadow-neo-mega: 8px 8px 0px 0px #111111;
+
+  /* Premium theme colors */
+  --color-brand-blue: #1D4ED8;          /* Vibrant Royal Sapphire Blue */
+  --color-warning-orange: #D97706;
+  --color-incident-red: #E11D48;        /* Ruby Rose Red */
+  --color-success-green: #059669;       /* Deep Emerald Green */
+  --color-blueprint-bg: #E5E3DB;        /* Slightly Blacker Concrete Gray */
+  --color-blueprint-dark: #0A0B0D;      /* Premium Carbon Obsidian Black */
+
+  /* Standard shadcn parameters mapped to premium brutalism */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+}
+
+:root {
+  --radius: 0px;
+  --background: #E5E3DB;      /* Slightly Blacker Concrete Gray Level 0 */
+  --foreground: #0F172A;      /* Premium Slate Solid Ink */
+  
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  
+  --primary: #1D4ED8;         /* Premium Royal Sapphire Blue */
+  --primary-foreground: #FFFFFF;
+  
+  --secondary: #DCDAD2;       /* Deeper Slate Concrete Contrast */
+  --secondary-foreground: #0F172A;
+  
+  --muted: #CFCDC5;           /* Cool Muted Concrete Gray */
+  --muted-foreground: #64748B; /* Slate Muted text */
+  
+  --accent: #DCDAD2;
+  --accent-foreground: #0F172A;
+  
+  --destructive: #E11D48;     /* Ruby Rose Incident Red */
+  --destructive-foreground: #FFFFFF;
+  
+  --border: #0F172A;          /* Crisp slate line */
+  --input: #0F172A;
+  --ring: #1D4ED8;
+  
+  --sidebar: #DCDAD2;
+  --sidebar-foreground: #0F172A;
+  --sidebar-primary: #1D4ED8;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #CFCDC5;
+  --sidebar-accent-foreground: #0F172A;
+  --sidebar-border: #0F172A;
+  --sidebar-ring: #1D4ED8;
+}
+
+.dark {
+  --background: #0A0B0D;      /* Premium Carbon Obsidian Black */
+  --foreground: #F8FAFC;      /* Premium Slate Off-White */
+  
+  --card: #121318;            /* Premium Slate Dark Surface */
+  --card-foreground: #F8FAFC;
+  --popover: #121318;
+  --popover-foreground: #F8FAFC;
+  
+  --primary: #3B82F6;         /* Electric Sapphire Blue */
+  --primary-foreground: #FFFFFF;
+  
+  --secondary: #1C1D24;       /* Slate Deep Contrast */
+  --secondary-foreground: #F8FAFC;
+  
+  --muted: #272933;           /* Dark Slate Muted Gray tint */
+  --muted-foreground: #94A3B8;
+  
+  --accent: #1C1D24;
+  --accent-foreground: #F8FAFC;
+  
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  
+  --border: #2A2D3A;          /* Premium Defined Slate Border */
+  --input: #2A2D3A;
+  --ring: #3B82F6;
+  
+  --sidebar: #121318;
+  --sidebar-foreground: #F8FAFC;
+  --sidebar-primary: #3B82F6;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1C1D24;
+  --sidebar-accent-foreground: #F8FAFC;
+  --sidebar-border: #2A2D3A;
+  --sidebar-ring: #3B82F6;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+
+  /* Neo-brutalist buttons & form elements override */
+  button, select, input, textarea {
+    border-radius: 0px !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  code, pre {
+    font-family: var(--font-mono);
+  }
+
+  /* Premium interactive hover elevations and blueprint glows */
+  input:focus, select:focus, textarea:focus {
+    background-color: var(--secondary) !important;
+    border-color: var(--primary) !important;
+    box-shadow: 4px 4px 0px 0px var(--primary) !important;
+    transform: translate(-2px, -2px);
+  }
+
+  button:active, a:active {
+    transform: scale(0.985);
+  }
+
+  /* Custom CAD workstation drafting scrollbars */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #F5F1E8;
+    border-left: 2px solid #111111;
+  }
+  .dark ::-webkit-scrollbar-track {
+    background: #15171C;
+    border-left: 2px solid #2E323D;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #111111;
+    border: 2px solid #F5F1E8;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #2E323D;
+    border: 2px solid #15171C;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #0052CC;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #3B82F6;
+  }
+}

@@ -7,13 +7,12 @@ export class GeminiClient {
     this.apiKey = options.apiKey ?? process.env.GEMINI_API_KEY ?? "";
     this.model = options.model ?? process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
     this.baseUrl = "https://generativelanguage.googleapis.com/v1beta";
-
-    if (!this.apiKey) {
-      throw new Error("Missing Gemini API key. Set GEMINI_API_KEY in the environment.");
-    }
   }
 
   async generateContent(prompt: string, responseSchema?: object): Promise<string> {
+    if (!this.apiKey) {
+      throw new Error("Missing Gemini API key. Set GEMINI_API_KEY in the environment.");
+    }
     const url = `${this.baseUrl}/models/${this.model}:generateContent?key=${this.apiKey}`;
 
     interface Part {

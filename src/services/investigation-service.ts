@@ -97,25 +97,42 @@ export function correlateIncidentsWithCommits(
   incidents: LocalIncident[],
   commits: GitHubCommit[],
 ): IncidentCommitCorrelation[] {
+  if (!incidents) return [];
+  const safeCommits = (commits || []).filter(
+    (commit) => commit && typeof commit.sha === "string" && typeof commit.message === "string"
+  );
+
   return incidents.map((incident) => {
-    const shaMatches = commits.filter((commit) => commit.sha.startsWith(incident.commit));
+    if (!incident || !incident.commit) {
+      return {
+        incident,
+        commits: [],
+        matchType: "none" as const,
+      };
+    }
+
+    const shaMatches = safeCommits.filter((commit) => {
+      if (!commit.sha) return false;
+      return commit.sha.toLowerCase().startsWith(incident.commit.toLowerCase());
+    });
 
     if (shaMatches.length > 0) {
       return {
         incident,
         commits: shaMatches,
-        matchType: "sha",
+        matchType: "sha" as const,
       };
     }
 
-    const messageMatches = commits.filter((commit) =>
-      commit.message.toLowerCase().includes(incident.commit.toLowerCase()),
-    );
+    const messageMatches = safeCommits.filter((commit) => {
+      if (!commit.message) return false;
+      return commit.message.toLowerCase().includes(incident.commit.toLowerCase());
+    });
 
     return {
       incident,
       commits: messageMatches,
-      matchType: messageMatches.length > 0 ? "message" : "none",
+      matchType: messageMatches.length > 0 ? "message" : ("none" as const),
     };
   });
 }
