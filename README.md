@@ -7,6 +7,8 @@ Instead of manually jumping between git histories, check suite logs, and release
 
 ---
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d0414f84-967c-4001-b7f4-390b88ab0cef" />
+
 ## Architecture Overview
 
 Sond follows a strict retrieval-then-analysis pipeline where the AI module consumes a pre-compiled state context with zero direct network hooks, ensuring robust type safety and isolated boundaries.
